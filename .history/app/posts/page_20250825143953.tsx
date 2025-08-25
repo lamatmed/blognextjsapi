@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
@@ -40,7 +39,7 @@ export default function PostsPage() {
     if (isLoggedIn) {
       fetchPosts();
     }
-  }, [isLoggedIn]);
+  }, [fetchPosts, isLoggedIn]);
 
   const fetchPosts = async () => {
     try {

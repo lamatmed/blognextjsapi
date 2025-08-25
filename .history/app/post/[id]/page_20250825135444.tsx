@@ -1,72 +1,32 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Post } from '@/types';
 import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 
-export default function PostDetail() {
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const params = useParams();
-  const router = useRouter();
-  const id = params.id as string;
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const res = await fetch(`/api/posts/${id}`);
-        
-        if (!res.ok) {
-          if (res.status === 404) {
-            router.push('/404');
-            return;
-          }
-          throw new Error('Failed to fetch post');
-        }
-        
-        const postData = await res.json();
-        setPost(postData);
-      } catch (error) {
-        console.error('Error fetching post:', error);
-        setError('Impossible de charger l\'article');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchPost();
+async function getPost(id: string): Promise<Post | null> {
+  try {
+    const res = await fetch(`https://blognextjsapi.vercel.app/api/posts/${id}`, {
+      cache: 'no-store',
+    });
+    
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error('Failed to fetch post');
     }
-  }, [id, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    return null;
   }
+}
 
-  if (error || !post) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Article non trouvé</h1>
-          <p className="text-gray-600 mb-6">{error || "L'article que vous recherchez n'existe pas."}</p>
-          <Link
-            href="/"
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            Retour aux articles
-          </Link>
-        </div>
-      </div>
-    );
+export default async function PostDetail({ params }: { params: { id: string } }) {
+  const post = await getPost(params.id);
+
+  if (!post) {
+    notFound();
   }
 
   // Calculer le temps de lecture (environ 200 mots par minute)
@@ -163,4 +123,26 @@ export default function PostDetail() {
       </div>
     </div>
   );
+}
+
+// Génération des métadonnées pour le référencement
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const post = await getPost(params.id);
+  
+  if (!post) {
+    return {
+      title: 'Article non trouvé',
+    };
+  }
+  
+  return {
+    title: `${post.title} | Blog Modern`,
+    description: post.content.substring(0, 160) + '...',
+    openGraph: {
+      title: post.title,
+      description: post.content.substring(0, 160) + '...',
+      images: post.image ? [post.image] : [],
+      type: 'article',
+    },
+  };
 }
