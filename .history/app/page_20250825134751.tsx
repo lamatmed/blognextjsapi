@@ -3,10 +3,14 @@ import Link from 'next/link';
 import { Post } from '@/types';
 import { ArrowRight, Calendar, User, PenTool, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import { headers } from 'next/headers';
 
 async function getPosts(): Promise<Post[]> {
-  
-  const res = await fetch('https://blognextjsapi.vercel.app/api/all-posts', { // Changez l'endpoint
+    const headersList = await headers();
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  const host = headersList.get('host');
+  const baseUrl = `${protocol}://${host}`;
+  const res = await fetch('/api/all-posts', { // Changez l'endpoint
     cache: 'no-store',
   });
   if (!res.ok) throw new Error('Failed to fetch posts');

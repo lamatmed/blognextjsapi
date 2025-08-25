@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 async function getPosts(): Promise<Post[]> {
   
-  const res = await fetch('https://blognextjsapi.vercel.app/api/all-posts', { // Changez l'endpoint
+  const res = await fetch('https://blognextjsapi.vercel.app//api/all-posts', { // Changez l'endpoint
     cache: 'no-store',
   });
   if (!res.ok) throw new Error('Failed to fetch posts');

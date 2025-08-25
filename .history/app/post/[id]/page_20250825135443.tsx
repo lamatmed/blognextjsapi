@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 
 async function getPost(id: string): Promise<Post | null> {
   try {
-    const res = await fetch(`https://blognextjsapi.vercel.app/api/posts/${id}`, {
+    const res = await fetch(`https://blognextjsapi.vercel.app//api/posts/${id}`, {
       cache: 'no-store',
     });
     
