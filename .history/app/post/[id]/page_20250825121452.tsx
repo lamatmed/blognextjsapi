@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 
 async function getPost(id: string): Promise<Post | null> {
   try {
-    const res = await fetch(`/api/posts/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/${id}`, {
       cache: 'no-store',
     });
     
